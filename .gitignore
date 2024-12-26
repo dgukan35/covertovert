@@ -24,3 +24,6 @@ go.work.sum
 .DS_Store
 .*
 _*
+
+./poetry.lock
+./pyproject.toml

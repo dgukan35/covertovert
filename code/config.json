@@ -1,18 +1,30 @@
 {
-  "covert_channel_code": "Replace it with the [Code] of chosen covert channel type seen in ODTUClass.",
+  "covert_channel_code": "CSC-PSV-ARP-SMA",
   "send": {
     "parameters": {
-      "parameter1": "p1",
-      "parameter2": 1234,
-      "log_file_name": "Example_UDPTimingInterarrivalChannelSender.log"
+      "psrc": "172.18.0.2",
+      "pdst": "172.18.0.3",
+      "hwdst":"ff:ff:ff:ff:ff:ff",
+      "hwsrc_prefix": "00:11:22:33:44:",
+      "cmpbit": "0",
+      "op": 1,
+      "min_range1": 1,
+      "max_range1": 127,
+      "min_range2": 128,
+      "max_range2": 255,
+      "log_file_name": "sender.log"
     }
   },
   "receive": {
     "parameters": {
-      "parameter1": "p1",
-      "parameter2": 1234,
-      "parameter3": "p3",
-      "log_file_name": "Example_UDPTimingInterarrivalChannelReceiver.log"
+      "psrc": "172.18.0.2",
+      "splt_char": ":",
+      "stp_char": ".",
+      "cmpval": 128,
+      "filter_arp": "arp",
+      "iface": "eth0",
+      "store": 0,
+      "log_file_name": "receiver.log"
     }
   }
 }
