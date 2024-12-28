@@ -24,6 +24,15 @@
       "filter_arp": "arp",
       "iface": "eth0",
       "store": 0,
+      "byte_len": 8,
+      "bit_0": "0",
+      "bit_1": "1",
+      "empty_char": "",
+      "last_index": -1,
+      "zero": 0,
+      "true": true,
+      "false": false,
+      "empty_list": [],
       "log_file_name": "receiver.log"
     }
   }

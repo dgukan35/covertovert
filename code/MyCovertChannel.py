@@ -12,6 +12,9 @@ class MyCovertChannel(CovertChannelBase):
         rnd_int = random.randint(minval, maxval)
         return format(rnd_int, "02x")
 
+    def convert_hex_to_int(self, hex_val):
+        return int(hex_val, 16)
+
     def send(self, psrc, pdst, hwdst, hwsrc_prefix, cmpbit, op,
              min_range1, max_range1, min_range2, max_range2, log_file_name):
         """
@@ -38,10 +41,11 @@ class MyCovertChannel(CovertChannelBase):
                 psrc=psrc,
                 pdst=pdst
             )
-            print(f"Sending bit: {bit}, Packet: {packet.summary()}")
             super().send(packet)
 
-    def receive(self, psrc, cmpval, splt_char, stp_char, filter_arp, iface, store, log_file_name):
+    def receive(self, psrc, cmpval, splt_char, stp_char, filter_arp,
+                iface, store, byte_len, bit_0, bit_1, empty_char,
+                last_index, zero, true, false, empty_list, log_file_name):
         """
         - Initialize an empty list to store the received bits.
         - Then, for each received message decode the source mac address by checking in which interval
@@ -50,34 +54,33 @@ class MyCovertChannel(CovertChannelBase):
         - For every new char received, check whether it is '.'. If it is, stop sniffing.
         - After the message is received, convert the binary representation to chars and construct the full message.
         """
-        received_message = []
-        stop_sniffing = False
+        received_message = empty_list
+        stop_sniffing = false
 
         def process_packet(packet):
             nonlocal stop_sniffing
             if packet[ARP].psrc == psrc:
                 src_mac = packet[ARP].hwsrc
 
-                last_byte = int(src_mac.split(splt_char)[-1], 16)
+                last_byte = self.convert_hex_to_int(src_mac.split(splt_char)[last_index])
 
                 if last_byte < cmpval:
-                    bit = "0"
+                    bit = bit_0
                 else:
-                    bit = "1"
+                    bit = bit_1
 
                 received_message.append(bit)
 
-                print(f"Received src_mac: {src_mac}, Decoded bit: {bit}")
-                if len(received_message) % 8 == 0:
-                    last_8_bits = ''.join(received_message[-8:])
+                if not (len(received_message) % byte_len):
+                    last_8_bits = empty_char.join(received_message[-byte_len:])
                     char = self.convert_eight_bits_to_character(last_8_bits)
                     if char == stp_char:
-                        stop_sniffing = True
+                        stop_sniffing = true
 
         sniff(filter=filter_arp, iface=iface, prn=process_packet, store=store, stop_filter=lambda x: stop_sniffing)
-        decoded_message = "".join(
-            self.convert_eight_bits_to_character(''.join(received_message[i:i + 8]))
-            for i in range(0, len(received_message), 8)
+        decoded_message = empty_char.join(
+            self.convert_eight_bits_to_character(empty_char.join(received_message[i:i + byte_len]))
+            for i in range(zero, len(received_message), byte_len)
         )
 
         self.log_message(decoded_message, log_file_name)
